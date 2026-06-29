@@ -1,0 +1,14 @@
+.vs/
+.agents/
+.codex/
+
+bin/
+obj/
+publish/
+
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+*.log
