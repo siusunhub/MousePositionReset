@@ -12,3 +12,6 @@ publish/
 *.sln.docstates
 
 *.log
+
+cursor.ico
+cursor.png

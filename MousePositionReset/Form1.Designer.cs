@@ -28,10 +28,17 @@ partial class Form1
     /// </summary>
     private void InitializeComponent()
     {
-        this.components = new System.ComponentModel.Container();
-        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-        this.ClientSize = new System.Drawing.Size(780, 520);
-        this.Text = "Mouse Position Reset";
+        System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+        SuspendLayout();
+        // 
+        // Form1
+        // 
+        AutoScaleMode = AutoScaleMode.None;
+        ClientSize = new Size(780, 520);
+        Icon = (Icon)resources.GetObject("$this.Icon");
+        Name = "Form1";
+        Text = "Mouse Position Reset";
+        ResumeLayout(false);
     }
 
     #endregion

@@ -13,7 +13,20 @@
     <Product>Mouse Position Reset</Product>
     <Company>Mouse Position Reset</Company>
     <Description>Mouse Position Reset</Description>
+    <PackageIcon>cursor.png</PackageIcon>
+    <ApplicationIcon>cursor.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="cursor.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\cursor.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Management" Version="10.0.9" />
