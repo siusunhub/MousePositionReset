@@ -15,3 +15,5 @@ publish/
 
 cursor.ico
 cursor.png
+
+!MousePositionReset.csproj.user
