@@ -1,4 +1,4 @@
-# Mouse Position Reset v0.2
+# Mouse Position Reset v0.3
 
 An elegant, modern Windows utility built with .NET 10 and Windows Forms that allows you to register global hotkeys to immediately reset or transition your mouse cursor to specific coordinates or center positions across multiple monitors. 
 
