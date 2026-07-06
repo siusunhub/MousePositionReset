@@ -4,6 +4,8 @@ An elegant, modern Windows utility built with .NET 10 and Windows Forms that all
 
 Additionally, it supports cycling your cursor sequentially through your monitors with a single customizable cycle hotkey.
 
+![Mouse Position Reset Usage](assets/mousepositionusage.jpg)
+
 ---
 
 ## Features
@@ -34,6 +36,10 @@ Additionally, it supports cycling your cursor sequentially through your monitors
 3. It will load settings from `MousePositionReset.json` (located in the same directory as the executable) if it exists, or start with defaults.
 4. Click **+ Add Shortcut** to bind a hotkey to a specific monitor position, or click **+ Add Cycle** to set up a cycle hotkey.
 5. Click **Save & Activate**. The app will minimize to your system tray. Double-click the tray icon at any time to reopen the configuration interface.
+
+### Settings & Configuration Demo
+
+![Mouse Position Reset Settings](assets/mousepositionsetting.png)
 
 ---
 
