@@ -6,10 +6,39 @@ namespace MousePositionReset;
 
 public partial class Form1 : Form
 {
-    private const string AppVersion = "v0.3";
+    private const string AppVersion = "v0.4";
 
     [DllImport("user32.dll", CharSet = CharSet.Auto)]
     private static extern bool DestroyIcon(IntPtr handle);
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool GetWindowRect(IntPtr hWnd, out RECT rect);
+
+    [DllImport("user32.dll")]
+    private static extern bool IsIconic(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    private static extern bool ShowWindow(IntPtr hWnd, int command);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr insertAfter, int x, int y, int width, int height, uint flags);
+
+    private const int ResizeWindowHotkeyId = 1000;
+    private const int SW_RESTORE = 9;
+    private const uint SWP_NOZORDER = 0x0004;
+    private const uint SWP_NOACTIVATE = 0x0010;
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct RECT
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
 
     // Monitor Item representation for dropdowns
     public class MonitorItem
@@ -49,6 +78,8 @@ public partial class Form1 : Form
     private Button btnAddShortcut = null!;
     private Button btnAddCycle = null!;
     private Button btnSave = null!;
+    private ComboBox cbResizeModifier = null!;
+    private ComboBox cbResizeKey = null!;
 
     public Form1()
     {
@@ -109,6 +140,63 @@ public partial class Form1 : Form
             ForeColor = Color.White
         };
         headerPanel.Controls.Add(lblTitle);
+
+        var lblResizeTitle = new Label
+        {
+            Text = "Auto Resize Window",
+            Location = ScalePoint(365, 6),
+            AutoSize = true,
+            Font = new Font("Segoe UI", 9.5F, FontStyle.Bold),
+            ForeColor = Color.White
+        };
+        headerPanel.Controls.Add(lblResizeTitle);
+
+        var lblResizeHotkey = new Label
+        {
+            Text = "Resize Hotkey:",
+            Location = ScalePoint(365, 35),
+            AutoSize = true,
+            Font = new Font("Segoe UI", 8.5F, FontStyle.Regular),
+            ForeColor = Color.FromArgb(209, 213, 219)
+        };
+        headerPanel.Controls.Add(lblResizeHotkey);
+
+        cbResizeModifier = new ComboBox
+        {
+            Location = ScalePoint(452, 30),
+            Size = ScaleSize(110, 25),
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            BackColor = Color.FromArgb(48, 48, 54),
+            ForeColor = Color.White,
+            FlatStyle = FlatStyle.Flat,
+            Font = new Font("Segoe UI", 8.5F)
+        };
+        cbResizeModifier.Items.AddRange(new object[] { "CTRL", "CTRL + SHIFT" });
+        headerPanel.Controls.Add(cbResizeModifier);
+
+        var lblResizePlus = new Label
+        {
+            Text = "+",
+            Location = ScalePoint(567, 34),
+            AutoSize = true,
+            Font = new Font("Segoe UI Semibold", 10F, FontStyle.Bold),
+            ForeColor = Color.FromArgb(209, 213, 219)
+        };
+        headerPanel.Controls.Add(lblResizePlus);
+
+        cbResizeKey = new ComboBox
+        {
+            Location = ScalePoint(586, 30),
+            Size = ScaleSize(55, 25),
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            BackColor = Color.FromArgb(48, 48, 54),
+            ForeColor = Color.White,
+            FlatStyle = FlatStyle.Flat,
+            Font = new Font("Segoe UI", 8.5F)
+        };
+        for (char c = 'A'; c <= 'Z'; c++) cbResizeKey.Items.Add(c.ToString());
+        for (char c = '0'; c <= '9'; c++) cbResizeKey.Items.Add(c.ToString());
+        headerPanel.Controls.Add(cbResizeKey);
 
         // Flow Layout Panel for Shortcuts
         flowLayoutPanelShortcuts = new FlowLayoutPanel
@@ -267,6 +355,10 @@ public partial class Form1 : Form
         _isSettingRunAsAdminCheckbox = true;
         chkRunAsAdministrator.Checked = _settings.RunAsAdministrator;
         _isSettingRunAsAdminCheckbox = false;
+
+        _settings.ResizeWindowHotkey ??= new ResizeWindowHotkeyConfig();
+        cbResizeModifier.Text = _settings.ResizeWindowHotkey.Modifier.ToUpperInvariant();
+        cbResizeKey.Text = _settings.ResizeWindowHotkey.Key.ToUpperInvariant();
 
         // Initialize temp shortcuts list
         _tempShortcuts.Clear();
@@ -1181,6 +1273,14 @@ public partial class Form1 : Form
             }
         }
 
+        string resizeHotkeyCombination = $"{cbResizeModifier.Text.Trim()}+{cbResizeKey.Text.Trim()}";
+        if (!duplicateCheck.Add(resizeHotkeyCombination))
+        {
+            MessageBox.Show($"Duplicate shortcut detected: '{resizeHotkeyCombination}'. Each shortcut must be unique.",
+                "Duplicate Shortcut", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
         // 1b. Validate duplicate monitors for normal shortcuts
         var monitorCheck = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var sc in _tempShortcuts)
@@ -1261,6 +1361,11 @@ public partial class Form1 : Form
 
         _settings.RunAtStartup = chkRunAtStartup.Checked;
         _settings.RunAsAdministrator = chkRunAsAdministrator.Checked;
+        _settings.ResizeWindowHotkey = new ResizeWindowHotkeyConfig
+        {
+            Modifier = cbResizeModifier.Text,
+            Key = cbResizeKey.Text
+        };
         _settings.Save();
 
         // 3. Re-register Hotkeys
@@ -1304,10 +1409,22 @@ public partial class Form1 : Form
                 id++;
             }
         }
+
+        if (!_hotKeyManager.Register(ResizeWindowHotkeyId, _settings.ResizeWindowHotkey.Modifier, _settings.ResizeWindowHotkey.Key))
+        {
+            MessageBox.Show($"Could not register resize shortcut '{_settings.ResizeWindowHotkey.Modifier} + {_settings.ResizeWindowHotkey.Key}'. It might be already registered by another program.",
+                "Hotkey Registration Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
     }
 
     private void OnHotKeyTriggered(int id)
     {
+        if (id == ResizeWindowHotkeyId)
+        {
+            ResizeForegroundWindow();
+            return;
+        }
+
         int index = id - 1;
         if (index >= 0 && index < _settings.Shortcuts.Count)
         {
@@ -1323,6 +1440,25 @@ public partial class Form1 : Form
                 CycleMousePosition(config);
             }
         }
+    }
+
+    private static void ResizeForegroundWindow()
+    {
+        IntPtr windowHandle = GetForegroundWindow();
+        if (windowHandle == IntPtr.Zero || !GetWindowRect(windowHandle, out _)) return;
+
+        if (IsIconic(windowHandle))
+        {
+            ShowWindow(windowHandle, SW_RESTORE);
+        }
+
+        Rectangle workArea = Screen.FromPoint(Cursor.Position).WorkingArea;
+        int width = (int)Math.Round(workArea.Width * 0.8);
+        int height = (int)Math.Round(workArea.Height * 0.8);
+        int x = workArea.X + (workArea.Width - width) / 2;
+        int y = workArea.Y + (workArea.Height - height) / 2;
+
+        SetWindowPos(windowHandle, IntPtr.Zero, x, y, width, height, SWP_NOZORDER | SWP_NOACTIVATE);
     }
 
     private void CycleMousePosition(CycleConfig config)

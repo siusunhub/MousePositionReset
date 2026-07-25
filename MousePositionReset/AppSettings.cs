@@ -7,6 +7,7 @@ public class AppSettings
 {
     public bool RunAtStartup { get; set; }
     public bool RunAsAdministrator { get; set; }
+    public ResizeWindowHotkeyConfig ResizeWindowHotkey { get; set; } = new();
     public List<ShortcutConfig> Shortcuts { get; set; } = new();
     public List<CycleConfig> Cycle { get; set; } = new();
 
@@ -50,6 +51,12 @@ public class AppSettings
             return false;
         }
     }
+}
+
+public class ResizeWindowHotkeyConfig
+{
+    public string Modifier { get; set; } = "CTRL";
+    public string Key { get; set; } = "R";
 }
 
 public class ShortcutConfig

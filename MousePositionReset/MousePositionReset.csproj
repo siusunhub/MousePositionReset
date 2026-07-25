@@ -13,6 +13,10 @@
     <Product>Mouse Position Reset</Product>
     <Company>Mouse Position Reset</Company>
     <Description>Mouse Position Reset</Description>
+    <Version>0.4.0</Version>
+    <AssemblyVersion>0.4.0.0</AssemblyVersion>
+    <FileVersion>0.4.0.0</FileVersion>
+    <InformationalVersion>0.4</InformationalVersion>
     <PackageIcon>cursor.png</PackageIcon>
     <ApplicationIcon>cursor.ico</ApplicationIcon>
   </PropertyGroup>
