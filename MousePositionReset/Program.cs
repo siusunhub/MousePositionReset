@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO;
 using System.Security.Principal;
 using System.Threading;
 
@@ -14,6 +15,15 @@ static class Program
     [STAThread]
     static void Main(string[] args)
     {
+        AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+        {
+            try
+            {
+                System.Windows.MessageBox.Show(e.ExceptionObject?.ToString(), "Mouse Position Reset Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
+            catch { }
+        };
+
         WaitForPreviousProcessExit(args);
 
         AppSettings startupSettings = AppSettings.Load();
@@ -28,23 +38,31 @@ static class Program
         _mutex = new Mutex(true, mutexName, out bool createdNew);
         if (!createdNew)
         {
-            MessageBox.Show("Mouse Position Reset is already running.", "Already Running", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            System.Windows.MessageBox.Show("Mouse Position Reset is already running.", "Already Running", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
             return;
         }
 
-        ApplicationConfiguration.Initialize();
+        var app = new App();
+        app.InitializeComponent();
+        app.ShutdownMode = System.Windows.ShutdownMode.OnExplicitShutdown;
 
         // Check if config file exists
         string configPath = AppSettings.GetConfigPath();
         bool configExists = File.Exists(configPath);
 
-        var mainForm = new Form1();
+        var mainWindow = new MainWindow();
+        app.MainWindow = mainWindow;
+
         if (configExists)
         {
-            mainForm.StartMinimized = true;
+            mainWindow.StartMinimized = true;
+        }
+        else
+        {
+            mainWindow.Show();
         }
 
-        Application.Run(mainForm);
+        app.Run();
     }
 
     internal static bool IsRunningAsAdministrator()

@@ -1,3 +1,4 @@
+using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -14,7 +15,20 @@ public class AppSettings
     public static string GetConfigPath()
     {
         string exePath = Environment.ProcessPath ?? AppDomain.CurrentDomain.BaseDirectory;
-        return Path.ChangeExtension(exePath, ".json");
+        string localPath = Path.ChangeExtension(exePath, ".json");
+        if (File.Exists(localPath))
+        {
+            return localPath;
+        }
+
+        // Fallback: Check installed location in AppData
+        string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "MousePositionReset", "MousePositionReset.json");
+        if (File.Exists(appDataPath))
+        {
+            return appDataPath;
+        }
+
+        return localPath;
     }
 
     public static AppSettings Load()

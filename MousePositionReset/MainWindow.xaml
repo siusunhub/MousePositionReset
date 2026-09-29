@@ -1,0 +1,87 @@
+<Window x:Class="MousePositionReset.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Mouse Position Reset v0.5"
+        Width="780" Height="520"
+        MinWidth="780" MinHeight="520"
+        MaxWidth="780" MaxHeight="520"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanMinimize"
+        Background="#141418"
+        Foreground="White"
+        FontFamily="Segoe UI">
+    <Grid>
+        <!-- Header Panel -->
+        <Border Background="#0F0F12" Height="65" VerticalAlignment="Top">
+            <Canvas Height="65">
+                <TextBlock Text="Mouse Position Reset"
+                           Canvas.Left="15" Canvas.Top="18"
+                           FontSize="21.33" FontWeight="Bold" Foreground="White"/>
+
+                <TextBlock Text="Auto Resize Window"
+                           Canvas.Left="365" Canvas.Top="6"
+                           FontSize="12.67" FontWeight="Bold" Foreground="White"/>
+
+                <TextBlock Text="Resize Hotkey:"
+                           Canvas.Left="365" Canvas.Top="35"
+                           FontSize="11.33" Foreground="#D1D5DB"/>
+
+                <ComboBox x:Name="cbResizeModifier"
+                          Canvas.Left="452" Canvas.Top="30"
+                          Width="110" Height="25"/>
+
+                <TextBlock Text="+"
+                           Canvas.Left="567" Canvas.Top="34"
+                           FontFamily="Segoe UI Semibold" FontWeight="Bold" FontSize="13.33" Foreground="#D1D5DB"/>
+
+                <ComboBox x:Name="cbResizeKey"
+                          Canvas.Left="586" Canvas.Top="30"
+                          Width="55" Height="25"/>
+            </Canvas>
+        </Border>
+
+        <!-- Middle Scrollable Area -->
+        <Border Margin="15,80,15,95" Background="#18181C" CornerRadius="3">
+            <ScrollViewer x:Name="scrollViewerShortcuts" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel x:Name="pnlShortcuts" Margin="6,6,6,6"/>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Divider Line -->
+        <Rectangle Height="1" Fill="#303036" Margin="15,0,15,85" VerticalAlignment="Bottom"/>
+
+        <!-- Bottom Controls -->
+        <Canvas Height="80" VerticalAlignment="Bottom">
+            <CheckBox x:Name="chkRunAtStartup"
+                      Content="Run at Startup"
+                      Canvas.Left="15" Canvas.Top="25"
+                      Click="chkRunAtStartup_Click"/>
+
+            <CheckBox x:Name="chkRunAsAdministrator"
+                      Content="Run as Admin"
+                      Canvas.Left="150" Canvas.Top="25"
+                      Click="chkRunAsAdministrator_Click"/>
+
+            <Button x:Name="btnAddShortcut"
+                    Content="+ Add Shortcut"
+                    Canvas.Left="300" Canvas.Top="20"
+                    Width="130" Height="36"
+                    Style="{StaticResource DarkButtonStyle}"
+                    Click="btnAddShortcut_Click"/>
+
+            <Button x:Name="btnAddCycle"
+                    Content="+ Add Cycle"
+                    Canvas.Left="440" Canvas.Top="20"
+                    Width="120" Height="36"
+                    Style="{StaticResource DarkButtonStyle}"
+                    Click="btnAddCycle_Click"/>
+
+            <Button x:Name="btnSave"
+                    Content="Save &amp; Activate"
+                    Canvas.Left="570" Canvas.Top="20"
+                    Width="180" Height="36"
+                    Style="{StaticResource AccentButtonStyle}"
+                    Click="btnSave_Click"/>
+        </Canvas>
+    </Grid>
+</Window>
