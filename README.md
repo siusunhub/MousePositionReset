@@ -46,7 +46,7 @@ Additionally, it supports cycling your cursor sequentially through your monitors
 
 ### Settings & Configuration Demo
 
-![Mouse Position Reset Settings](assets/mousepositionsetting.png)
+![Mouse Position Reset Settings](assets/mousepositionsetting05.png)
 
 ---
 
